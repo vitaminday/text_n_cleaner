@@ -2,16 +2,11 @@
 
 #Text-n-Cleaner
 
-#Version 0.1.1
+#Version 0.1.3
 
 #Prepare a subtitle txt-file for translation using online services.
 #For example: Google Translate (https://translate.google.ru/).
 #Save your favorite files from terrible formatting.
-
-#For example:
-#Executive file:   D:\work\textcleaner\tnc.rb
-#Test file: C:\Users\vin\download\subtitle.txt
-#Test command: D:\work\textcleaner\tnc.rb C:\Users\vin\Downloads\subtitle.txt
 
 #Setup the libraries
 require 'clipboard'
@@ -22,12 +17,13 @@ initialize
 	@bad_text = nil
 	@file_name_new = nil
 	@good_text = nil
+	@msg_symb = 72
 
 #Get the file name from the Command line
 def get_arg
 	if ARGV.length != 1 then
     usage1
-    exit(1)
+    stopp
 	end
 
 	@file_name = ARGV[0]
@@ -35,27 +31,32 @@ def get_arg
 #File existence check
 	if File.exist?(@file_name) == false then
 		usage3
-		exit(1)
+		stopp
 	end
 
 #File name check: Is it the TXT file ????
 	if File.extname(@file_name) != ".txt" then
 		usage1
-		exit(1)
+		stopp
 	end
 
 #Check:   File size >1Mb ????
-#	size = File.size(@file_name)
-#	print "File size:  ", size
-
-	if File.size(@file_name) >= 1000 then
+	if File.size(@file_name) >= 1048576 then
 		usage4
-		exit(1)
+		stopp
 	end
 
-#TODO: File size = 0 ???
-#File.size?
+#Check:   File is empty ???
+	if File.size?(@file_name) == nil then
+		usage5
+		stopp
+	end
+end
 
+#Short message and exit
+def stopp
+	str4 = STDIN.gets
+	exit(0)
 end
 
 #Get text from the file
@@ -75,7 +76,7 @@ def alert_5000
  	total_characters = @good_text.length
  	if total_characters >= 5000 then
  		usage2
- 		exit(0)
+ 		exec("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe", "https://translate.google.ru/?hl=ru&tab=TT#view=home&op=docs&sl=en&tl=ru")
  	end
 end
 
@@ -96,59 +97,71 @@ def send_to_clipboard
 	Clipboard.copy(@good_text)
 end
 
+def header
+	puts "\n-------------------------------------------------------------------------"
+	puts "=== TextNCleaner ===".center(@msg_symb, ' '), "\n"
+end
+
+def footer
+	puts "\n-------------------------------------------------------------------------"
+end
+
 #Problem Report: No TXT file
 def usage1
-	puts "\n------------------------------------------------"
-	puts "             === TextNCleaner ==="
-	puts "\n ...We need the name of the subtitle TXT file."
-    puts "     Please, enter the path to that file."
-    puts "\n------------------------------------------------"
+	header
+	puts "...We need the name of the subtitle TXT file.".center(@msg_symb, ' ')
+    puts "Please, enter the path to TXT file.".center(@msg_symb, ' ')
+    footer
 end
 
 #Problem Report: Text length exceeds 5000 characters.
 def usage2
-	puts "\n-------------------------------------------------------------------------"
-	puts "                       === TextNCleaner ===                             \n"
-	puts "\n   Your corrected file has been successfully copied to the clipboard!"
-	puts "\n                            WARNING:"
-	puts "\n          Text length exceeds 5000 characters possible!"
-	puts "        Please use the translation function from the file."
-	puts "\n           For example, you can use the following link:"
-	puts " https://translate.google.ru/?hl=ru&tab=TT#view=home&op=docs&sl=ru&tl=en"
-	puts "\n-------------------------------------------------------------------------"
+	header
+	puts "Your corrected file has been successfully copied to the clipboard!".center(@msg_symb, ' ')
+	puts "\n", "WARNING:".center(@msg_symb, ' ')
+	puts "\n", "Text length exceeds 5000 characters possible!".center(@msg_symb, ' ')
+	puts "Please use the translation function from the file.".center(@msg_symb, ' ')
+	puts "\n", "For example, you can use the following link:".center(@msg_symb, ' ')
+	puts "https://translate.google.ru/?hl=ru&tab=TT#view=home&op=docs&sl=ru&tl=en".center(@msg_symb, ' ')
+	footer
 end
 
 #Problem Report: File not found
 def usage3
-	puts "\n-------------------------------------------"
-	puts "           === TextNCleaner ==="
-	puts "\n       ATTENTION: File not found!!!"
-	puts "   Please, enter the path to that file."
-	puts "\n-------------------------------------------"
+	header
+	puts "ATTENTION: File not found!!!".center(@msg_symb, ' ')
+	puts "Please, enter the path to that file.".center(@msg_symb, ' ')
+	footer
 end
 
 #Problem Report: File size exceed 1Mb
 def usage4
-	puts "\n---------------------------------------------"
-	puts "           === TextNCleaner ==="
-	puts "\n                 WARNING:"
-	puts "         File size exceeds 1MB."
-	puts " Please use the advanced translation method."
-	puts "\n---------------------------------------------"
+	header
+	puts "WARNING:".center(@msg_symb, ' ')
+	puts "File size exceeds 1MB.".center(@msg_symb, ' ')
+	puts "Please use the advanced translation method.".center(@msg_symb, ' ')
+	print "\n\n", "Press ENTER to complete.".center(@msg_symb, ' '), "\n"
+	footer
+end
+
+#Problem Report: File have 0 byte size
+def usage5
+	header
+	puts "ATTENTION: This file is empty!!!".center(@msg_symb, ' ')
+	puts "Please check the file or select another one.".center(@msg_symb, ' ')
+	footer
 end
 
 #Successful completion
 def congrates
-	puts "\n---------------------------------------------------------------------"
-	puts "                      === TextNCleaner ===                             \n"
-	puts "\n Your corrected file has been successfully copied to the clipboard!"
-	puts "\n              You can take yours new file here:"
-	puts "          #{@file_name_new}"
-	puts "\n                      --- Good Lack! ---"
-	puts "---------------------------------------------------------------------"
+	header
+	puts "Your corrected file has been successfully copied to the clipboard!".center(@msg_symb, ' ')
+	puts "\n", "You can take yours new file here:".center(@msg_symb, ' ')
+	puts "#{@file_name_new}".center(@msg_symb, ' ')
+	puts "\n", "--- Good Lack! ---".center(@msg_symb, ' ')
+	footer
 end
 
-#def main
 	get_arg
 	get_text
 	text_n_cleaner
@@ -157,4 +170,3 @@ end
 	send_to_clipboard
 	alert_5000
 	congrates
-#end
