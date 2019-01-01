@@ -16,6 +16,7 @@
 
 #Setup the libraries
 require 'clipboard'
+require 'messagebox'
 
 
 #Message parameters:
@@ -151,7 +152,10 @@ end
 
 #Message OK
 @congrates = ["Content corrected successfully and added to clipboard!",
-	"\n", "You can take a new file here:",
-	@file_name_new, "\n", "--- Good Lack! ---"]
+	"\n", "You can also get a new file here:",
+	@file_name_new, "\n", "Good Lack!!!"]
 
-	message(@congrates)
+MessageBox.new("Text-N-Cleaner:", message(@congrates)).show
+
+#	message(@congrates)
+#@congrates.join("\n")
