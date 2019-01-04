@@ -22,13 +22,13 @@ require 'messagebox'
 #Message parameters:
 @msg_symb = 72
 @border_symb = "-"
-@prg_name = "=== Text-N-Cleaner ==="
+@prg_name = "Text-N-Cleaner"
 
 @usage1 = ["...We need the name of the subtitle TXT file.",
 	"\n", "Please, enter the path to TXT file!"]
 
 @usage2 = ["Your corrected file has been successfully copied to the clipboard!",
-	"\n", "WARNING:", "Text length exceeds 5000 characters possible!",
+	"\n", "WARNING: Alert 5000!", "\n", "Text length exceeds 5000 characters possible!",
 	"You must use the translation function from the file.", "\n",
 	"For example, you can use the following link:", 
 	"https://translate.google.ru/?hl=ru&tab=TT#view=home&op=docs&sl=ru&tl=en"]
@@ -47,41 +47,35 @@ require 'messagebox'
 #Get the file name from the Command line
 def get_arg
 	if ARGV.length != 1 then
-    message(@usage1)
-    stopp
+	MessageBox::Warning.new(@prg_name, message2(@usage1)).show
+	exit(0)
 	end
 
 	@file_name = ARGV[0]
 
 #File existence check
 	if File.exist?(@file_name) == false then
-		message(@usage3)
-		stopp
+		MessageBox::Warning.new(@prg_name, message2(@usage3)).show
+		exit(0)
 	end
 
 #File name check: Is it the TXT file ????
 	if File.extname(@file_name) != ".txt" then
-		message(@usage1)
-		stopp
+		MessageBox::Warning.new(@prg_name, message2(@usage1)).show
+		exit(0)
 	end
 
 #Check:   File size >1Mb ????
 	if File.size(@file_name) >= 1048576 then
-		message(@usage4)
-		stopp
+		MessageBox::Warning.new(@prg_name, message2(@usage4)).show
+		exit(0)
 	end
 
 #Check:   File is empty ???
 	if File.size?(@file_name) == nil then
-		message(@usage5)
-		stopp
+		MessageBox::Warning.new(@prg_name, message2(@usage5)).show
+		exit(0)
 	end
-end
-
-#Short message and exit
-def stopp
-	str4 = STDIN.gets
-	exit(0)
 end
 
 #Get text from the file
@@ -100,9 +94,10 @@ end
 def alert_5000
  	total_characters = @good_text.length
  	if total_characters >= 5000 then
- 		message(@usage2)
+ 		MessageBox::Warning.new(@prg_name, message2(@usage2)).show
  		exec("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe", 
  			"https://translate.google.ru/?hl=ru&tab=TT#view=home&op=docs&sl=en&tl=ru")
+ 		exit(0)
  	end
 end
 
@@ -123,22 +118,14 @@ def send_to_clipboard
 	Clipboard.copy(@good_text)
 end
 
-def message(msg)
-
-	border = ""
-	@msg_symb.times do
-		border = border + @border_symb
-	end
-
-	puts "\n", border
-	
-	puts @prg_name.center(@msg_symb, " "), "\n"
+def message2(msg)
+	a = []
 
 	msg.each do |str|
-	puts str.center(@msg_symb, " ")
+	a << str.center(@msg_symb, " ")
 	end
 
-	puts border
+	msg = a.join("\n")
 end
 
 #Main
@@ -155,7 +142,5 @@ end
 	"\n", "You can also get a new file here:",
 	@file_name_new, "\n", "Good Lack!!!"]
 
-MessageBox.new("Text-N-Cleaner:", message(@congrates)).show
-
-#	message(@congrates)
-#@congrates.join("\n")
+MessageBox.new(@prg_name, message2(@congrates)).show
+exit(0)
